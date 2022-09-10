@@ -1,2 +1,3 @@
 .ccls-cache/
-.a.out.dSYM/
+a.out.dSYM/
+./a.out
