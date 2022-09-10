@@ -19,17 +19,22 @@ int main() {
     InitKeybindHT();
 
     Texture* t = LoadTexture("res/splotch.png");
-    Sound* s = LoadSound("res/PinkPanther30.wav");
-    SoundSource* source = SoundSourceCreate();
-    SoundSourceFull(source, 1.1f, 1.0f, (vec3){0, 0, 1}, true);
-    SoundSourcePlay(source, s);
+    Sound* pink_panther_sound = LoadSound("res/PinkPanther30.wav");
+    Sound* can_drop_sound = LoadSound("res/can_drop.wav");
+    SoundSource* pink_panther_source = SoundSourceCreate();
+    SoundSource* can_drop_source = SoundSourceCreate();
+    SoundSourceFull(pink_panther_source, 1.1f, 1.0f, (vec3){0, 0, 1}, true);
+    SoundSourceFull(can_drop_source, 0.9f, 1.0f, (vec3){0, 0, 0}, false);
     
-    KeyBindRegister("toggle_sound", KEY_P, KEY_NONE);
+    SoundSourcePlay(pink_panther_source, pink_panther_sound);
+    
+    KeyBindRegister("toggle_panther_sound", KEY_P, KEY_NONE);
+    KeyBindRegister("play_can_drop", KEY_C, KEY_B);
     
     Camera c;
     Timer timer1, timer2;
     InitCameraIso(&c);
-    float rotation = 0;
+    float rotation = 0, scale = 1;
     int x = 0, y = 0;
     
     while (!WindowShouldClose()) {
@@ -52,13 +57,16 @@ int main() {
             ResetTimer(&timer1);
         }
 
-        if (IsKeyBindPressed("toggle_sound")) {
-            if (SoundSourcePlaying(source)) {
-                SoundSourcePause(source);
+        if (IsKeyBindPressed("toggle_panther_sound")) {
+            if (SoundSourcePlaying(pink_panther_source)) {
+                SoundSourcePause(pink_panther_source);
             }
             else {
-                SoundSourceUnpause(source);
+                SoundSourceUnpause(pink_panther_source);
             }
+        }
+        if (IsKeyBindPressed("play_can_drop")) {
+            SoundSourcePlay(can_drop_source, can_drop_sound);
         }
         
         BindTexture(t);
@@ -66,20 +74,26 @@ int main() {
             rotation += WindowDeltaTime() * 1000;
         if (IsKeyDown(KEY_RIGHT))
             rotation -= WindowDeltaTime() * 1000;
+        if (IsKeyDown(KEY_UP))
+            scale += WindowDeltaTime() * 1;
+        if (IsKeyDown(KEY_DOWN))
+            scale -= WindowDeltaTime() * 1;
 
         for (int i = -3; i < 3; i++) {
             for (int j = -3; j < 3; j++) {
-                DrawCubeEx((vec3){i * 5, j * 5, 0}, (vec3){1, 1, 1}, (vec3){1, 0, 1}, rotation, &c);
+                DrawCubeEx((vec3){i * 5, j * 5, 0}, (vec3){scale, scale, scale}, (vec3){1, 0, 1}, rotation, &c);
             }
         }
         
         x = cos(WindowGetTime()) * 10;
         y = sin(WindowGetTime()) * 10;
-        SoundSourceSetPos(source, (vec3){x, y, 2});
+        SoundSourceSetPos(pink_panther_source, (vec3){x, y, 2});
     }
 
-    SoundSourceDestroy(source);
-    FreeSound(s);
+    SoundSourceDestroy(pink_panther_source);
+    SoundSourceDestroy(can_drop_source);
+    FreeSound(pink_panther_sound);
+    FreeSound(can_drop_sound);
     FreeTexture(t);
     
     DeinitKeybindHT();
