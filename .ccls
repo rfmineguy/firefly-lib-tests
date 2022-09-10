@@ -1,0 +1,3 @@
+clang
+%h %c -std=c99
+-I

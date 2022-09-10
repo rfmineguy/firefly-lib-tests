@@ -1,0 +1,6 @@
+[WARN, src/testlog_main.c, 11]: Hello World, 45
+[CRIT, src/testlog_main.c, 12]: This is a critical error
+[DEBUG, src/testlog_main.c, 13]: This is a debug message [69]
+[INFO, src/testlog_main.c, 14]: This is an info message [420]
+[ERROR, src/testlog_main.c, 15]: This is an error message [21]
+Hello World
