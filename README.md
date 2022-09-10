@@ -1,3 +1,5 @@
+![GitHub repo size](https://img.shields.io/github/repo-size/rfmineguy/firefly-lib-tests)
+
 # firefly-lib-tests
 A repository dedicated to testing the firefly-lib.
 
