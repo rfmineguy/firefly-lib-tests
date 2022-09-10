@@ -16,14 +16,15 @@ int main() {
     SetLogStream(stdout);
     InitRendering();
     InitSoundMaster();
+    InitKeybindHT();
+
     Texture* t = LoadTexture("res/splotch.png");
     Sound* s = LoadSound("res/PinkPanther30.wav");
     SoundSource* source = SoundSourceCreate();
-    SoundSource* source2 = SoundSourceCreate();
     SoundSourceFull(source, 1.1f, 1.0f, (vec3){0, 0, 1}, true);
-    SoundSourceFull(source2, 1.0f, 2.f, (vec3){0, 1, 0}, false);
     SoundSourcePlay(source, s);
-    SoundSourcePlay(source2, s);
+    
+    KeyBindRegister("toggle_sound", KEY_P, KEY_NONE);
     
     Camera c;
     Timer timer1, timer2;
@@ -51,7 +52,7 @@ int main() {
             ResetTimer(&timer1);
         }
 
-        if (IsKeyPressed(KEY_P)) {
+        if (IsKeyBindPressed("toggle_sound")) {
             if (SoundSourcePlaying(source)) {
                 SoundSourcePause(source);
             }
@@ -68,7 +69,7 @@ int main() {
 
         for (int i = -3; i < 3; i++) {
             for (int j = -3; j < 3; j++) {
-                DrawCubeEx((vec3){i * 5, j * 5, 0}, (vec3){2, 2, 2}, (vec3){1, 0, 1}, rotation, &c);
+                DrawCubeEx((vec3){i * 5, j * 5, 0}, (vec3){1, 1, 1}, (vec3){1, 0, 1}, rotation, &c);
             }
         }
         
@@ -78,10 +79,10 @@ int main() {
     }
 
     SoundSourceDestroy(source);
-    SoundSourceDestroy(source2);    
     FreeSound(s);
     FreeTexture(t);
-
+    
+    DeinitKeybindHT();
     FreeRendering();
     DeinitSoundMaster();
     DestroyWindowGL();
