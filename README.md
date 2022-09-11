@@ -9,6 +9,8 @@ A repository dedicated to testing the firefly-lib.
 ```makefile
   make <target>
   make <target> run
+  make <target> leaks         : Leak detection for MacOS
+  make <target> valgrind      : Leak detection for Linux
 ```
 # Targets
 * `testall` => Builds a file that encompases most of what the library is capable of doing (this is the most updated test)
