@@ -7,8 +7,8 @@ A repository dedicated to testing the firefly-lib.
 2. Once you have built that, there are a few targets in this repo<br>
 # Building tests
 ```makefile
-  make <target>
-  make <target> run
+  make <target>               : Build the specified target without running it
+  make <target> run           : Build the specified target with running it
   make <target> leaks         : Leak detection for MacOS
   make <target> valgrind      : Leak detection for Linux
 ```
