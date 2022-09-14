@@ -8,16 +8,14 @@
 #include <firefly/Core/Camera.h>
 #include <firefly/Resource/Resource.h>
 #include <firefly/Resource/Sound.h>
+#include <firefly/Core/Init.h>
 #include <unistd.h>
 #include <math.h>
 
 int main() {
-    InitWindowGL();
+    InitializeFeatures(AUDIO|INPUT|RENDERING);
     SetLogStream(stdout);
-    InitRendering();
-    InitSoundMaster();
-    InitKeybindHT();
-
+    
     Texture* t = LoadTexture("res/splotch.png");
     Sound* pink_panther_sound = LoadSound("res/PinkPanther30.wav");
     Sound* can_drop_sound = LoadSound("res/can_drop.wav");
@@ -53,9 +51,12 @@ int main() {
         UpdateCamera(&c);
         SoundMasterSetListener(c.camPos, (vec3){0, 0, 0});
         
-        TimerStartIntervalEx(&timer1, 5, SECOND);
+        TimerStartIntervalEx(&timer1, 1, SECOND);
         if (TimerElapsed(&timer1)) {
             LOG_INFO("Timer elapsed, %0.4f", WindowGetTime());
+            LOG_DEBUG("Random integer [10, 15] -> %d", RandomRangeInt(10, 15));
+            LOG_DEBUG("Random float [5 - 10.3] -> %0.12f", RandomRangeFloat(5, 10.3));
+            LOG_DEBUG("Random float -> %0.4f", RandomFloat());
             ResetTimer(&timer1);
         }
 
@@ -70,6 +71,9 @@ int main() {
         if (IsKeyBindPressed("play_can_drop")) {
             SoundSourcePlay(can_drop_source, can_drop_sound);
         }
+        if (IsKeyBindDown("play_can_drop")) {
+            LOG_INFO("\"play_can_drop\" keybind");
+        }
         
         BindTexture(t);
         if (IsKeyDown(KEY_LEFT))
@@ -83,7 +87,8 @@ int main() {
 
         for (int i = -3; i < 3; i++) {
             for (int j = -3; j < 3; j++) {
-                DrawCubeEx((vec3){i * 5, j * 5, 0}, (vec3){scale, scale, scale}, (vec3){1, 0, 1}, rotation, &c);
+                DrawCubeEx((vec3){i * 5 + cos(WindowGetTime()) * 2, j * 5 + sin(WindowGetTime()) * 2, 0}, (vec3){scale, scale, scale}, 
+                    (vec3){1, 0, 1}, rotation, &c);
             }
         }
         
@@ -98,9 +103,6 @@ int main() {
     FreeSound(can_drop_sound);
     FreeTexture(t);
     
-    DeinitKeybindHT();
-    FreeRendering();
-    DeinitSoundMaster();
-    DestroyWindowGL();
+    DeInitializeFeatures();
     LOG_WARN("Program ending. Successful run");
 }
