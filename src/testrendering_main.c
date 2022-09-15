@@ -33,7 +33,7 @@ int main() {
     
     Camera c;
     Timer timer1, timer2;
-    InitCameraIso(&c);
+    InitCamera(&c, PERSPECTIVE);
     float rotation = 0, scale = 1;
     int x = 0, y = 0;
     
