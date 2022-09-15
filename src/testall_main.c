@@ -12,19 +12,28 @@
 #include <unistd.h>
 #include <math.h>
 
+// Wave file defines
 #define CAN_DROP_WAV "can_drop_wav"
 #define PINK_PANTHER_WAV "pink_panther_wav"
 
+// Texture file defines
+#define SPLOTCH_TEX "sploch_tex"
+#define WEIRD_CIRCLE "weird_circle"
+
+// Keybind name defines
+#define TOGGLE_PANTHER_SOUND_KEY "toggle_panther_sound"
+#define PLAY_CAN_DROP_SOUND_KEY "play_can_drop"
+
 void setup_keybinds() {
-    KeyBindRegister("toggle_panther_sound", KEY_P, KEY_NONE);
-    KeyBindRegister("play_can_drop", KEY_C, KEY_B);
+    KeyBindRegister(TOGGLE_PANTHER_SOUND_KEY, KEY_P, KEY_NONE);
+    KeyBindRegister(PLAY_CAN_DROP_SOUND_KEY, KEY_C, KEY_B);
 }
 
 void load_resources() {
     PutSoundResource(LoadSound("res/can_drop.wav"), CAN_DROP_WAV);
     PutSoundResource(LoadSound("res/PinkPanther30.wav"), PINK_PANTHER_WAV);
-    PutTextureResource(LoadTexture("res/splotch.png"), "splotch_tex");
-    PutTextureResource(LoadTexture("res/weird_green_circle_tex.png"), "weird_circle");
+    PutTextureResource(LoadTexture("res/splotch.png"), SPLOTCH_TEX);
+    PutTextureResource(LoadTexture("res/weird_green_circle_tex.png"), WEIRD_CIRCLE);
 }
 
 int main() {
@@ -57,7 +66,7 @@ int main() {
         SoundMasterSetListener(c.camPos, (vec3){0, 0, 0});
         
         TimerStartIntervalEx(&timer1, 1, SECOND);
-        if (IsKeyBindPressed("toggle_panther_sound")) {
+        if (IsKeyBindPressed(TOGGLE_PANTHER_SOUND_KEY)) {
             LOG_DEBUG("%p", GetSoundResource(PINK_PANTHER_WAV));
             if (SoundSourcePlaying(pink_panther_source)) {
                 SoundSourcePause(pink_panther_source);
@@ -66,16 +75,17 @@ int main() {
                 SoundSourceUnpause(pink_panther_source);
             }
         }
-        if (IsKeyBindPressed("play_can_drop")) {
+        if (IsKeyBindPressed(PLAY_CAN_DROP_SOUND_KEY)) {
             Sound* s = GetSoundResource(CAN_DROP_WAV);
             LOG_DEBUG("%p", s);
             SoundSourcePlay(can_drop_source, GetSoundResource(CAN_DROP_WAV));
         }
-        if (IsKeyBindDown("play_can_drop")) {
-            LOG_INFO("\"play_can_drop\" keybind");
+        if (IsKeyBindDown(PLAY_CAN_DROP_SOUND_KEY)) {
+            LOG_INFO("\"%s\" keybind", PLAY_CAN_DROP_SOUND_KEY);
         }
         
-        BindTexture(GetTextureResource("weird_circle"));
+        BindTexture(GetTextureResource(WEIRD_CIRCLE));
+
         if (IsKeyDown(KEY_LEFT))
             rotation += WindowDeltaTime() * 1000;
         if (IsKeyDown(KEY_RIGHT))
