@@ -41,8 +41,8 @@ int main() {
     setup_keybinds();
     load_resources();
     
-    SoundSource* pink_panther_source = SoundSourceCreateEx(1.1f, 1.0f, (vec3){0, 0, 1}, true);
-    SoundSource* can_drop_source = SoundSourceCreateEx(0.9f, 1.0f, (vec3){0, 0, 0}, false);
+    SoundSource* pink_panther_source = SoundSourceCreate(1.1f, 1.0f, (vec3){0, 0, 1}, true);
+    SoundSource* can_drop_source = SoundSourceCreate(0.9f, 1.0f, (vec3){0, 0, 0}, false);
     SoundSourcePlay(pink_panther_source, GetSoundResource(PINK_PANTHER_WAV));
     
     Camera c;
@@ -64,8 +64,10 @@ int main() {
         
         UpdateCamera(&c);
         SoundMasterSetListener(c.camPos, (vec3){0, 0, 0});
-        
-        TimerStartIntervalEx(&timer1, 1, SECOND);
+
+        //
+        // DEAL WITH PLAYING THE PINK PANTHER SOUNDS
+        //        
         if (IsKeyBindPressed(TOGGLE_PANTHER_SOUND_KEY)) {
             LOG_DEBUG("%p", GetSoundResource(PINK_PANTHER_WAV));
             if (SoundSourcePlaying(pink_panther_source)) {
@@ -75,6 +77,10 @@ int main() {
                 SoundSourceUnpause(pink_panther_source);
             }
         }
+        
+        //
+        // DEAL WITH PLAYING THE CAN DROP SOUNDS
+        //
         if (IsKeyBindPressed(PLAY_CAN_DROP_SOUND_KEY)) {
             Sound* s = GetSoundResource(CAN_DROP_WAV);
             LOG_DEBUG("%p", s);
@@ -84,6 +90,9 @@ int main() {
             LOG_INFO("\"%s\" keybind", PLAY_CAN_DROP_SOUND_KEY);
         }
         
+        //
+        // DEAL WITH DRAWING THE WORLD
+        //
         BindTexture(GetTextureResource(WEIRD_CIRCLE));
 
         if (IsKeyDown(KEY_LEFT))
@@ -94,7 +103,7 @@ int main() {
             scale += WindowDeltaTime() * 1;
         if (IsKeyDown(KEY_DOWN))
             scale -= WindowDeltaTime() * 1;
-
+        
         for (int i = -3; i < 3; i++) {
             for (int j = -3; j < 3; j++) {
                 DrawCubeEx((vec3){i * 5 + cos(WindowGetTime()) * 2, j * 5 + sin(WindowGetTime()) * 2, 0}, (vec3){scale, scale, scale}, (vec3){1, 0, 1}, rotation, &c);
@@ -110,3 +119,4 @@ int main() {
     DeInitializeFeatures();
     LOG_WARN("Program ending. Successful run");
 }
+

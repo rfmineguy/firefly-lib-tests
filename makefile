@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -Wall -g -O3
+CFLAGS = -Wall -g
 
 testall: src/testall_main.c
 	$(CC) $(CFLAGS) src/testall_main.c -lfirefly
