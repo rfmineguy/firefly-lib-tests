@@ -16,6 +16,12 @@ testrendering: src/testrendering_main.c
 testresource: src/testresource_main.c
 	$(CC) $(CFLAGS) src/testresource_main.c -lfirefly
 
+testcpp: src/testcpp.cpp
+	clang++ $(CFLAGS) src/testcpp.cpp -lfirefly
+
+test_refactor: src/test_refactor.c
+	$(CC) $(CFLAGS) src/test_refactor.c -lfirefly
+
 valgrind:
 	valgrind --tool=memcheck ./a.out
 

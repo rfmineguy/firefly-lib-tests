@@ -5,6 +5,7 @@
 #include <firefly/IO/IO.h>
 #include <firefly/Rendering/Rendering.h>
 #include <unistd.h>
+#include <stdarg.h>
 
 int main() {
     InitWindowGL();
