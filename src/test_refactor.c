@@ -58,7 +58,11 @@ int main() {
     }
     
     int x = 0, y = 0, z = 0;
-    FF_RendererDrawGeometryEx(quad, c, (vec3){x, y, z},(vec3){1, 1, 1}, (vec3){0, 0, 1}, 0);
+    for (int i = 0; i < 10; i++) {
+      for (int j = 0; j < 10; j++) {
+        FF_RendererDrawGeometryEx(quad, c, (vec3){i * 2, j * 2, z},(vec3){1, 1, 1}, (vec3){0, 0, 1}, 0);
+      }
+    }
   }
 
   FreeGeometry(quad);
