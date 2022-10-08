@@ -7,11 +7,10 @@
 #include <math.h>
 
 #include <firefly/Core/OrthoCamera.h>
+#include <firefly/Core/PerspectiveCamera.h>
 #include <firefly/Core/Camera.h>
 #include <firefly/Resource/Texture.h>
 #include <firefly/Resource/ResourceManager.h>
-
-const char* SPLOTCH = "splotch";
 
 void setup_keybinds() {
   FF_KeyBindRegister("left", KEY_NONE, KEY_LEFT);
@@ -20,10 +19,7 @@ void setup_keybinds() {
   FF_KeyBindRegister("down", KEY_NONE, KEY_DOWN);
 }
 
-void load_resources() {
-  // Resource manager needs some work. it doesn't work in its current state
-  //FF_PutResource(FF_TEXTURE, FF_LoadTexture("res/splotch.png"), SPLOTCH);
-}
+void load_resources() {}
 
 void init() {
   SetLogStream(stdout);
@@ -48,7 +44,7 @@ int main() {
   init();
 
   // Create the window using the opengl api (currently the only api)
-  Window* w = FF_CreateWindowGL("Window", 600, 600);
+  Window* w = FF_CreateWindowGL("Window", 1000, 1000);
   
   // Create the renderer with the opengl api
   FF_InitRenderer();
@@ -69,8 +65,8 @@ int main() {
   while (!FF_WindowShouldClose(w)) {
     FF_WindowPollEvents(w);
     FF_WindowClearBackgroundEx(w, 0.4f, 0.4f, 0.4f, 1.0f);
-
-    FF_OrthoCameraUpdate(&c);
+    
+    FF_OrthoCameraUpdate(&c, false);
     
     if (FF_IsKeyPressed(KEY_SPACE)) {
       FF_ToggleCursorLocked(w);
@@ -87,15 +83,8 @@ int main() {
     }
     
     FF_BindTexture(tex);
-    float scale = fabs(sin(FF_GetTime()) + 1);
-    float rotation = tan(FF_GetTime()) * 100;
-
-    int x = 0, y = 0, z = -5;
-    for (int i = 0; i < 5; i++) {
-      for (int j = 0; j < 5; j++) {
-        FF_RendererDrawGeometryEx(cube, c, (vec3){i * 3, j * 3, z},(vec3){scale, scale, scale}, (vec3){0, 0, 1}, rotation);
-      }
-    }
+    float x = sin(FF_GetTime()) * 5;
+    FF_RendererDrawGeometryEx(quad, c, (vec3){0, 0, 0}, (vec3){2, 2, 1}, (vec3){0, 0, 1}, 0);
   }
 
   FreeGeometry(quad);
