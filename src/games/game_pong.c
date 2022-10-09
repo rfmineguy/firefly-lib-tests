@@ -4,6 +4,17 @@
 #include <firefly/Rendering/Renderer.h>
 #include <firefly/Core/OrthoCamera.h>
 
+typedef struct {
+  float x, y, w, h;
+} Rect;
+
+typedef struct {
+  vec3 pos;
+  vec3 scale;
+  vec3 rot_axis;
+  float rotation;
+} Transform;
+
 void setup_keybinds() {
   FF_KeyBindRegister("left", KEY_NONE, KEY_LEFT);
   FF_KeyBindRegister("right", KEY_NONE, KEY_RIGHT);
@@ -36,30 +47,24 @@ int main() {
   Geometry quad = GenerateQuad();
   Camera c = FF_OrthoCamera();
   Texture t = FF_LoadTexture("res/splotch.png");
+  //Material m = FF_Material();
+  //m.albedo = (Color){255, 100, 150};
   
-  int left_y = 0;
-  int right_y = 0;
+  int ball_x = 300, ball_y = 300;
   
   while (!FF_WindowShouldClose(w)) {
     FF_WindowPollEvents(w);
     FF_WindowClearBackgroundEx(w, 0.4f, 0.4f, 0.4f, 1.0f);
+    if (FF_WasWindowResized(w)) {
+      FF_OrthoCameraUpdateProj(&c, FF_WindowGetWidth(w), FF_WindowGetHeight(w));
+    }
     
-    FF_OrthoCameraUpdate(&c, false);
+    FF_OrthoCameraUpdate(&c, true);
     
-    if (FF_IsKeyDown(KEY_S))
-      left_y--;
-    if (FF_IsKeyDown(KEY_W))
-      left_y++;
-    if (FF_IsKeyDown(KEY_DOWN))
-      right_y--;
-    if (FF_IsKeyDown(KEY_UP))
-      right_y++;
-    
-    // draw left paddle
     FF_BindTexture(t);
-    FF_RendererDrawGeometryEx(quad, c, (vec3){-7, left_y, 0}, (vec3){1, 8, 1}, (vec3){0, 0, 0}, 0);
-    FF_RendererDrawGeometryEx(quad, c, (vec3){7, right_y, 0}, (vec3){1, 8, 1}, (vec3){0, 0, 0}, 0);
-    // draw right paddle
+    
+    // draw ball
+    FF_RendererDrawGeometryEx(quad, c, (vec3){5, 7, 0}, (vec3){2, 1, 1}, (vec3){0, 0, 0}, 0);
   }
   
   FreeGeometry(quad);
