@@ -41,8 +41,8 @@ void run_left_paddle(Rect* left_paddle, int h) {
       left_paddle->y -= 4;
     if (left_paddle->y < 0)
       left_paddle->y = 0;
-    if (left_paddle->y > h)
-      left_paddle->y = h;
+    if (left_paddle->y + left_paddle->h > h)
+      left_paddle->y = h - left_paddle->h;
 }
 void run_right_paddle(Rect* right_paddle, int h) {
     if (FF_IsKeyDown(KEY_DOWN))
@@ -51,11 +51,11 @@ void run_right_paddle(Rect* right_paddle, int h) {
       right_paddle->y -= 4;
     if (right_paddle->y < 0)
       right_paddle->y = 0;
-    if (right_paddle->y > h)
-      right_paddle->y = h;
+    if (right_paddle->y + right_paddle->h > h)
+      right_paddle->y = h - right_paddle->h;
 }
 void run_ball(Ball* ball, Window* w) {
-  if (ball->r.x < 0 || ball->r.x > FF_WindowGetWidth(w)) {
+  if (ball->r.x < 0 || ball->r.x + ball->r.w > FF_WindowGetWidth(w)) {
     ball->vel_x *= -1;
   }
   if (ball->r.y < 0 || ball->r.y > FF_WindowGetHeight(w)) {
@@ -65,10 +65,15 @@ void run_ball(Ball* ball, Window* w) {
   ball->r.y += ball->vel_y * FF_WindowDeltaTime(w);
 }
 
+void reset_ball(Ball* ball, Window* w) {
+  ball->r.x = FF_WindowGetWidth(w) / 2.f;
+  ball->r.y = FF_WindowGetHeight(w) / 2.f;
+}
+
 //collision assuming x,y is the center
-bool collided(Rect* a, Rect* b) {
-  bool xOverlap = a->x < b->x + b->w && a->x + a->w > b->x;
-  bool yOveralp = a->y < b->y + b->h && a->y + a->h > b->y;
+bool collided(Rect a, Rect b) {
+  bool xOverlap = a.x < b.x + b.w && a.x + a.w > b.x;
+  bool yOveralp = a.y < b.y + b.h && a.y + a.h > b.y;
   return xOverlap && yOveralp;
 }
 
@@ -80,7 +85,7 @@ int main() {
   Geometry quad = GenerateQuad();
   Camera c = FF_OrthoCamera();
   Texture t = FF_LoadTexture("res/splotch.png");
-  Ball ball = (Ball) {.r=(Rect){300, 300, 60, 20}, .vel_x=100, .vel_y=150 };
+  Ball ball = (Ball) {.r=(Rect){300, 300, 20, 20}, .vel_x=100, .vel_y=150 };
   Rect left_paddle = (Rect){40, FF_WindowGetHeight(w) / 2.f - 75, 10, 150};
   Rect right_paddle = (Rect){FF_WindowGetWidth(w) - 50, FF_WindowGetHeight(w) / 2.f - 75, 10, 150};
   int left_score = 0, right_score = 0;
@@ -93,24 +98,29 @@ int main() {
       FF_OrthoCameraUpdateProj(&c, FF_WindowGetWidth(w), FF_WindowGetHeight(w));
     }
     
-    FF_OrthoCameraUpdate(&c, false);
-    FF_BindTexture(t);
-    
     run_left_paddle(&left_paddle, FF_WindowGetHeight(w));
     run_right_paddle(&right_paddle, FF_WindowGetHeight(w));
     run_ball(&ball, w);
 
-    if (collided(&ball.r, &left_paddle)) {
-      LOG_INFO("Collision");
-    }
-    if (collided(&ball.r, &left_paddle) || collided(&ball.r, &right_paddle)) {
+    if (collided(ball.r, left_paddle) || collided(ball.r, right_paddle)) {
       ball.vel_x *= -1;
+    }
+    if (collided(ball.r, (Rect){1, 0, 1, FF_WindowGetHeight(w)})) {
+      LOG_INFO("RIGHT SCORED");
+      reset_ball(&ball, w);
+    }
+
+    if (collided(ball.r, (Rect){FF_WindowGetWidth(w) - 1, 0, 1, FF_WindowGetHeight(w)})) {
+      LOG_INFO("LEFT SCORED");
+      reset_ball(&ball, w);
     }
     
     if (FF_IsKeyPressed(KEY_R)) {
-      ball.r.x = FF_WindowGetWidth(w) / 2.f;
-      ball.r.y = FF_WindowGetHeight(w) / 2.f;
+      reset_ball(&ball, w);
     }
+
+    FF_OrthoCameraUpdate(&c, false);
+    FF_BindTexture(t);
 
     // draw ball
     FF_RendererDrawGeometryEx(quad, c, (vec3){ball.r.x, ball.r.y, 0}, (vec3){ball.r.w, ball.r.h, 1}, (vec3){0}, 0);
