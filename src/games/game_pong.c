@@ -66,6 +66,8 @@ void run_ball(Ball* ball, Window* w) {
 }
 
 void reset_ball(Ball* ball, Window* w) {
+  ball->vel_x = (100 + FF_RandomRangeFloat(-20, 20)) * FF_RandomFromSet(2, (double[]){-1, 1});
+  ball->vel_y = (150 + FF_RandomRangeFloat(-20, 20)) * FF_RandomFromSet(2, (double[]){-1, 1});
   ball->r.x = FF_WindowGetWidth(w) / 2.f;
   ball->r.y = FF_WindowGetHeight(w) / 2.f;
 }
@@ -85,7 +87,10 @@ int main() {
   Geometry quad = GenerateQuad();
   Camera c = FF_OrthoCamera();
   Texture t = FF_LoadTexture("res/splotch.png");
-  Ball ball = (Ball) {.r=(Rect){300, 300, 20, 20}, .vel_x=100, .vel_y=150 };
+  Sound paddle_bounce = FF_LoadSound("res/sounds/paddle_bounce.wav");
+  Sound death = FF_LoadSound("res/sounds/death_sound.wav");
+  SoundSource source = FF_SoundSourceEx(1.0f, 1.0f, (vec3){0, 0, 0}, false);
+  Ball ball = (Ball) { .r=(Rect){300, 300, 20, 20}, .vel_x=100, .vel_y=150 };
   Rect left_paddle = (Rect){40, FF_WindowGetHeight(w) / 2.f - 75, 10, 150};
   Rect right_paddle = (Rect){FF_WindowGetWidth(w) - 50, FF_WindowGetHeight(w) / 2.f - 75, 10, 150};
   int left_score = 0, right_score = 0;
@@ -93,10 +98,6 @@ int main() {
   while (!FF_WindowShouldClose(w)) {
     FF_WindowPollEvents(w);
     FF_WindowClearBackgroundEx(w, 0.4f, 0.4f, 0.4f, 1.0f);
-    if (FF_WasWindowResized(w)) {
-      LOG_DEBUG("WindowWidth: %d, WindowHeight: %d", FF_WindowGetWidth(w), FF_WindowGetHeight(w));
-      FF_OrthoCameraUpdateProj(&c, FF_WindowGetWidth(w), FF_WindowGetHeight(w));
-    }
     
     run_left_paddle(&left_paddle, FF_WindowGetHeight(w));
     run_right_paddle(&right_paddle, FF_WindowGetHeight(w));
@@ -104,19 +105,25 @@ int main() {
 
     if (collided(ball.r, left_paddle) || collided(ball.r, right_paddle)) {
       ball.vel_x *= -1;
+      FF_SoundSourcePlay(source, paddle_bounce);
     }
     if (collided(ball.r, (Rect){1, 0, 1, FF_WindowGetHeight(w)})) {
       LOG_INFO("RIGHT SCORED");
+      FF_SoundSourcePlay(source, death);
       reset_ball(&ball, w);
     }
 
     if (collided(ball.r, (Rect){FF_WindowGetWidth(w) - 1, 0, 1, FF_WindowGetHeight(w)})) {
       LOG_INFO("LEFT SCORED");
+      FF_SoundSourcePlay(source, death);
       reset_ball(&ball, w);
     }
     
     if (FF_IsKeyPressed(KEY_R)) {
       reset_ball(&ball, w);
+    }
+    if (FF_IsKeyPressed(KEY_P)) {
+      LOG_INFO("%0.4f", FF_RandomFromSet(5, (double[]){2, 3, -5, 31, 4}));
     }
 
     FF_OrthoCameraUpdate(&c, false);
@@ -128,6 +135,8 @@ int main() {
     FF_RendererDrawGeometryEx(quad, c, (vec3){right_paddle.x, right_paddle.y, 0}, (vec3){right_paddle.w, right_paddle.h, 1}, (vec3){0}, 0);
   }
   
+  FF_FreeSound(paddle_bounce);
+  FF_FreeSound(death);
   FreeGeometry(quad);
   FF_FreeTexture(t);
   
