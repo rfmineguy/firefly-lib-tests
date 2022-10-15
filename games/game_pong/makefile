@@ -6,7 +6,7 @@ prepare:
 	rm -rf out
 	-mkdir out
 
-game_pong: src/game_pong.c
+game_pong: src/game_pong.c src/ball.c src/paddle.c
 	$(CC) $(CFLAGS) -o $@ $^ -lfirefly
 	mv game_pong out
 

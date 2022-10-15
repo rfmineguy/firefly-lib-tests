@@ -1,5 +1,5 @@
-.ccls-cache/
-a.out.dSYM/
+./ccls-cache/
+./a.out.dSYM/
 ./a.out
-games/game_pong/game_pong.dSYM/
-games/game_pong/out/
+./games/game_pong/game_pong.dSYM/
+./games/game_pong/out/
