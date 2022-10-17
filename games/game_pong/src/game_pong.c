@@ -11,10 +11,6 @@
 #include "ball.h"
 #include "paddle.h"
 
-/*
-  Learn about arena allocators and try to see if it will make a difference for a new resource manager approach
-*/
-
 // SETUP
 void setup_keybinds() {
   FF_KeyBindRegister("left_paddle_up", KEY_W, KEY_NONE);
@@ -25,16 +21,16 @@ void setup_keybinds() {
 
 void init() {
   SetLogStream(stdout);
-  FF_InitFontSystem();
+  //FF_InitFontSystem();
   FF_InitKeybindHT();      //figure out how to unglobalize this maybe? this is required due to a hashmap being used
   FF_RandomSeedTime();
 
   setup_keybinds();
 }
 
-void deinit(FF_Window* w, FF_Renderer* r, FF_AudioSystem* as) {
+void deinit(FF_Window* w, FF_Renderer* r, FF_AudioSystem* as, FF_FontLoader* fl) {
   FF_DeinitKeybindHT();
-  FF_DeinitFontSystem();
+  FF_DestroyFontLoader(fl);
   FF_DestroyAudioSystem(as);
   FF_DestroyRenderer(r);
   FF_DestroyWindowGL(w);
@@ -54,6 +50,7 @@ int main() {
   FF_Window* w = FF_CreateWindowGL("Pong", 600, 600, false);
   FF_Renderer* r = FF_CreateRenderer(w);
   FF_AudioSystem* audioSystem = FF_CreateAudioSystem();
+  FF_FontLoader* font_loader = FF_CreateFontLoader();
   FF_SetAudioListener(audioSystem, (vec3){0, 0, 0}, (vec3){0, 0, 0});
   
   /*
@@ -65,7 +62,7 @@ int main() {
   FF_Sound paddle_bounce = FF_LoadSound("../res/paddle_bounce.wav");
   FF_Sound death = FF_LoadSound("../res/death_sound.wav");
   FF_SoundSource source = FF_CreateSoundSourceEx(audioSystem, 1.0f, 1.0f, (vec3){0, 0, 0}, false);
-  FF_Font f = FF_LoadFont("/System/Library/Fonts/Supplemental/Times New Roman.ttf");
+  FF_Font f = FF_LoadFont(font_loader, "/System/Library/Fonts/Supplemental/Times New Roman.ttf");
   
   /*
    * GAME SPECIFIC DATA (PONG)
@@ -96,7 +93,7 @@ int main() {
      * DETECT WHEN BALL HITS LEFT WALL
      */
     if (collided(ball.r, (FF_Rect){1, 0, 1, FF_WindowGetHeight(w)})) {
-      FF_SoundSourcePlay(source, death);
+      //FF_SoundSourcePlay(source, death);
       reset_ball(&ball, w);
       right_score++;
       LOG_INFO("Score: %d - %d", left_score, right_score);
@@ -119,6 +116,10 @@ int main() {
       reset_ball(&ball, w);
     }
     
+    if (FF_IsKeyPressed(KEY_L)) {
+      FF_SoundSourcePlay(source, paddle_bounce);
+    }
+    
     /*
      * SOME INTERPOLATION LOGIC (not all interpolation functions work/are implemented)
      */
@@ -137,6 +138,7 @@ int main() {
     FF_RendererDrawGeometry(r, quad, c, (vec3){left_paddle.r.x, left_paddle.r.y, 0},   (vec3){left_paddle.r.w, left_paddle.r.h, 1},   (vec3){0}, 0);
     FF_RendererDrawGeometry(r, quad, c, (vec3){right_paddle.r.x, right_paddle.r.y, 0}, (vec3){right_paddle.r.w, right_paddle.r.h, 1}, (vec3){0}, 0);
     FF_RendererDrawGeometry(r, quad, c, (vec3){test_lerp.x, test_lerp.y, 0},       (vec3){test_lerp.w, test_lerp.h, 1},       (vec3){0}, 0);
+    // This causes sounds to go silent
     FF_RendererDrawText(r, f, c, (vec2){FF_WindowGetWidth(w) / 2.f, FF_WindowGetHeight(w) / 2.f}, 1.0f, "Hi");
   }
   
@@ -146,7 +148,7 @@ int main() {
   FreeGeometry(quad);
   FF_FreeTexture(t);
   
-  deinit(w, r, audioSystem);
+  deinit(w, r, audioSystem, font_loader);
   FF_FreeSound(paddle_bounce);
   FF_FreeSound(death);
 }
