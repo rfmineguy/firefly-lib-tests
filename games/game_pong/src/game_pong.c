@@ -139,7 +139,10 @@ int main() {
     FF_RendererDrawGeometry(r, quad, c, (vec3){right_paddle.r.x, right_paddle.r.y, 0}, (vec3){right_paddle.r.w, right_paddle.r.h, 1}, (vec3){0}, 0);
     FF_RendererDrawGeometry(r, quad, c, (vec3){test_lerp.x, test_lerp.y, 0},       (vec3){test_lerp.w, test_lerp.h, 1},       (vec3){0}, 0);
     // This causes sounds to go silent
-    FF_RendererDrawText(r, f, c, (vec2){FF_WindowGetWidth(w) / 2.f, FF_WindowGetHeight(w) / 2.f}, 1.0f, "Hi");
+    
+    double red = cos(FF_GetTime());
+    double blue = sin(FF_GetTime());
+    FF_RendererDrawText(r, f, c, (vec2){FF_WindowGetWidth(w) / 2.f, FF_WindowGetHeight(w) / 2.f}, (vec3){red, 0.7, blue}, 1.0f, "Hi");
   }
   
   /*
