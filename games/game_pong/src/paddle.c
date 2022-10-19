@@ -3,7 +3,7 @@
 #include <firefly/Core/Input.h>
 
 void run_paddle_ai(Paddle *paddle, Ball *ball, int h, double dt) {
-  paddle->r.y = FF_Lerp(paddle->r.y, ball->r.y, dt * 10);  
+  paddle->r.y = FF_LerpFunc(FF_LerpFuncLinear, paddle->r.y, ball->r.y, dt * 10);  
   if (paddle->r.y < 0) {
     paddle->r.y = 0;
   }
@@ -14,10 +14,10 @@ void run_paddle_ai(Paddle *paddle, Ball *ball, int h, double dt) {
 
 void run_paddle_human(Paddle* paddle, const char* up, const char* down, int h) {
   if (FF_IsKeyBindDown(up)) {
-    paddle->r.y = FF_Lerp(paddle->r.y, paddle->r.y - 10, 0.4);
+    paddle->r.y = FF_LerpFunc(FF_LerpFuncLinear, paddle->r.y, paddle->r.y - 10, 0.4);  
   }
   if (FF_IsKeyBindDown(down)) {
-    paddle->r.y = FF_Lerp(paddle->r.y, paddle->r.y + 10, 0.4);
+    paddle->r.y = FF_LerpFunc(FF_LerpFuncLinear, paddle->r.y, paddle->r.y + 10, 0.4);  
   }
   if (paddle->r.y < 0)
     paddle->r.y = 0;
